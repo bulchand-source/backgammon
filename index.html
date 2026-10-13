@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es" class="app-shell">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Backgammon para dos</title>
+<meta name="description" content="Backgammon para dos jugadores en el mismo dispositivo, con reglas internacionales.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Backgammon">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#e4e8e2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e1411" media="(prefers-color-scheme: dark)">
+<meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&family=Marcellus&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<!-- app:start -->
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <h1>Backgammon</h1>
+      <p class="match-meta" id="matchMeta">Partida a 5 puntos · Juego 1</p>
+    </div>
+    <nav class="top-actions" aria-label="Partida">
+      <button type="button" class="btn btn-ghost" id="btnRules">Reglas</button>
+      <button type="button" class="btn" id="btnNew">Nueva partida</button>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <div class="board-wrap">
+      <svg id="board" class="board" viewBox="0 0 950 700" role="img" aria-label="Tablero de backgammon"></svg>
+      <p class="rotate-hint">Gira el móvil: en horizontal el tablero se ve más grande.</p>
+    </div>
+
+    <section class="pcard" id="pcard-1" aria-label="Jugador con negras">
+      <div class="pcard-id">
+        <span class="chip chip-b" aria-hidden="true"></span>
+        <div class="pcard-who">
+          <div class="pname" id="pname-1">Jugador 2</div>
+          <div class="pcolor">Negras <span class="turn-pill">Juega</span></div>
+        </div>
+      </div>
+      <div class="pscore"><span id="pscore-1">0</span><small id="pscoreof-1"></small></div>
+      <dl class="pstats">
+        <div><dt>Pips</dt><dd id="ppips-1">167</dd></div>
+        <div><dt>Barra</dt><dd id="pbar-1">0</dd></div>
+        <div><dt>Fuera</dt><dd id="poff-1">0</dd></div>
+      </dl>
+    </section>
+
+    <section class="actions-panel" aria-label="Acciones">
+      <p class="status" id="status" aria-live="polite"></p>
+      <div class="actions" id="actions"></div>
+      <p class="cube-info" id="cubeInfo"></p>
+    </section>
+
+    <section class="log-panel" aria-labelledby="logTitle">
+      <h2 class="section-label" id="logTitle">Anotación</h2>
+      <div class="log-scroll" id="logScroll">
+        <ol class="log" id="log"></ol>
+      </div>
+    </section>
+
+    <section class="pcard" id="pcard-0" aria-label="Jugador con blancas">
+      <div class="pcard-id">
+        <span class="chip chip-w" aria-hidden="true"></span>
+        <div class="pcard-who">
+          <div class="pname" id="pname-0">Jugador 1</div>
+          <div class="pcolor">Blancas <span class="turn-pill">Juega</span></div>
+        </div>
+      </div>
+      <div class="pscore"><span id="pscore-0">0</span><small id="pscoreof-0"></small></div>
+      <dl class="pstats">
+        <div><dt>Pips</dt><dd id="ppips-0">167</dd></div>
+        <div><dt>Barra</dt><dd id="pbar-0">0</dd></div>
+        <div><dt>Fuera</dt><dd id="poff-0">0</dd></div>
+      </dl>
+    </section>
+  </main>
+</div>
+
+<dialog class="sheet" id="dlgNew" aria-labelledby="dlgNewTitle">
+  <form id="formNew" class="sheet-body">
+    <h2 class="sheet-title" id="dlgNewTitle">Nueva partida</h2>
+    <div class="field-row">
+      <div class="field">
+        <label for="nameWhite"><span class="chip chip-w chip-sm" aria-hidden="true"></span>Blancas (abajo)</label>
+        <input id="nameWhite" name="nameWhite" maxlength="20" autocomplete="off" value="Jugador 1">
+      </div>
+      <div class="field">
+        <label for="nameBlack"><span class="chip chip-b chip-sm" aria-hidden="true"></span>Negras (arriba)</label>
+        <input id="nameBlack" name="nameBlack" maxlength="20" autocomplete="off" value="Jugador 2">
+      </div>
+    </div>
+    <div class="field">
+      <label for="matchLength">Duración</label>
+      <select id="matchLength" name="matchLength">
+        <option value="1">A 1 punto (sin cubo)</option>
+        <option value="3">A 3 puntos</option>
+        <option value="5" selected>A 5 puntos</option>
+        <option value="7">A 7 puntos</option>
+        <option value="9">A 9 puntos</option>
+        <option value="11">A 11 puntos</option>
+        <option value="13">A 13 puntos</option>
+        <option value="15">A 15 puntos</option>
+        <option value="21">A 21 puntos</option>
+        <option value="0">Sin límite (por dinero)</option>
+      </select>
+      <p class="hint" id="lengthHint">Gana quien llegue antes a los puntos. Se aplica la regla Crawford.</p>
+    </div>
+    <label class="check" for="jacoby">
+      <input type="checkbox" id="jacoby" name="jacoby" disabled>
+      <span>Regla Jacoby: los gammons solo cuentan si alguien ha doblado. Solo en partidas sin límite.</span>
+    </label>
+    <p class="warn" id="newWarn" hidden>La partida en curso se perderá.</p>
+    <div class="sheet-actions">
+      <button type="button" class="btn btn-ghost" id="btnCancelNew">Cancelar</button>
+      <button type="submit" class="btn btn-primary">Empezar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="sheet sheet-wide" id="dlgRules" aria-labelledby="dlgRulesTitle">
+  <div class="sheet-body rules">
+    <h2 class="sheet-title" id="dlgRulesTitle">Reglas</h2>
+    <p class="rules-lead">Reglas del estándar internacional. El juego solo permite jugadas legales, así que no hace falta memorizarlas.</p>
+
+    <h3>Objetivo y tablero</h3>
+    <p>Cada jugador tiene 15 fichas. Gana quien saque antes todas sus fichas del tablero. Las blancas se sientan abajo y su casa es el cuadrante inferior derecho; las negras se sientan arriba y su casa es el superior derecho. Las blancas avanzan en sentido antihorario y las negras en sentido horario. Los números del borde se muestran desde el punto de vista de quien tiene el turno.</p>
+
+    <h3>Salida</h3>
+    <p>Cada jugador tira un dado. Empieza quien saque más y juega esos dos números. Si empatan, se vuelve a tirar.</p>
+
+    <h3>Movimiento</h3>
+    <ul>
+      <li>Cada dado es un movimiento. Puedes mover dos fichas o la misma ficha dos veces.</li>
+      <li>Con dobles se juega el número cuatro veces.</li>
+      <li>No puedes caer en una punta con dos o más fichas rivales.</li>
+      <li>Hay que usar los dos dados si se puede. Si solo se puede usar uno, tiene que ser el mayor cuando sea posible. Si no hay ninguna jugada, se pasa el turno.</li>
+    </ul>
+
+    <h3>Golpes y barra</h3>
+    <p>Si caes en una punta con una sola ficha rival, la golpeas y va a la barra. Quien tenga fichas en la barra debe meterlas en la casa del rival antes de mover cualquier otra.</p>
+
+    <h3>Sacar fichas</h3>
+    <p>Cuando tus 15 fichas están en casa, puedes sacarlas. Se saca con el número exacto de la punta. Con un número mayor solo puedes sacar la ficha de la punta más alta. Si te golpean mientras sacas, tienes que volver a entrar y llevar la ficha a casa antes de seguir sacando.</p>
+
+    <h3>Cubo de doblaje</h3>
+    <p>Antes de tirar, puedes ofrecer doblar el valor del juego si el cubo está en el centro o es tuyo. El rival acepta, y se queda el cubo, o rechaza y pierde el valor actual. El cubo llega como máximo a 64.</p>
+
+    <h3>Gammon y backgammon</h3>
+    <p>Si el perdedor no ha sacado ninguna ficha, pierde un gammon (doble). Si además tiene fichas en la barra o en la casa del ganador, pierde un backgammon (triple). El resultado se multiplica por el cubo.</p>
+
+    <h3>Partidas a puntos</h3>
+    <p>Gana quien llegue antes a los puntos acordados. Regla Crawford: cuando un jugador se queda a un punto de ganar, el juego siguiente se juega sin cubo. En los juegos posteriores el cubo vuelve.</p>
+
+    <h3>Sin límite</h3>
+    <p>Se suman los puntos de cada juego sin final fijo. Con la regla Jacoby, los gammons y backgammons solo cuentan si se ha doblado.</p>
+
+    <h3>Abandonar</h3>
+    <p>Quien tiene el turno puede abandonar ofreciendo una sencilla, un gammon o un backgammon. El rival decide si acepta. Si rechaza, el juego sigue.</p>
+
+    <h3>Cómo se juega aquí</h3>
+    <ul>
+      <li>Toca una ficha y después una de las puntas marcadas. Si el destino usa los dos dados, la ficha hace los dos saltos.</li>
+      <li>Para sacar fichas, toca la bandeja de la derecha cuando aparezca marcada.</li>
+      <li>Deshacer anula el último movimiento del turno. Confirmar pasa el turno al rival.</li>
+      <li>Teclado: Espacio o Intro para tirar y confirmar, Retroceso o Ctrl+Z para deshacer, Esc para soltar la ficha.</li>
+      <li>La partida se guarda en este navegador. Puedes cerrar la página y seguir después.</li>
+    </ul>
+    <div class="sheet-actions">
+      <button type="button" class="btn btn-primary" id="btnCloseRules">Entendido</button>
+    </div>
+  </div>
+</dialog>
+<!-- app:end -->
+<div class="install-tip" id="installTip" role="status" hidden>
+  <img src="icons/apple-touch-icon.png" alt="" width="40" height="40">
+  <p>Para tenerlo como app, pulsa <strong>Compartir</strong> y luego <strong>Añadir a pantalla de inicio</strong>. Funciona sin conexión.</p>
+  <button type="button" class="btn" id="btnInstallTip">Entendido</button>
+</div>
+<script src="js/engine.js"></script>
+<script src="js/app.js"></script>
+<script src="js/pwa.js"></script>
+</body>
+</html>
